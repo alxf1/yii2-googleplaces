@@ -1,0 +1,30 @@
+{
+    "name": "indicalabs/yii2-googleplaces",
+    "description": "The Google places widget for the Yii framework",
+    "keywords": ["yii2", "Google", "Google Places", "widget"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/indicalabs/yii2-googleplaces/issues",
+        "forum": "http://www.yiiframework.com/forum/",
+        "source": "https://github.com/indicalabs/yii2-googleplaces"
+    },
+    "authors": [
+        {
+            "name": "Venu Narukulla",
+            "email": "venu.narukulla@gmail.com"
+        }
+    ],
+    "require": {
+     	"php": ">=5.4.0",
+        "yiisoft/yii2": ">=2.0.4"
+    },
+    "autoload": {
+        "psr-4": { "indicalabs\\googleplaces\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
+    }
+}
