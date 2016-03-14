@@ -5,16 +5,15 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\google;
-use yii\web\AssetBundle;
+namespace indicalabs\googleplaces;
 
 /**
  * @author Venu Narukulla. Venu <venu.narukulla@gmail.com>
  * @since 2.0
  */
-class GoogleAsset extends AssetBundle
+class GoogleAsset extends yii\web\AssetBundle
 {
-	public $sourcePath = '@yii/googleplaces/assets';
+	public $sourcePath = '@indicalabs/googleplaces/assets';
 	public $js = [
 		'js/jquery.placecomplete.js',
 		//'js/typeahead.js',
