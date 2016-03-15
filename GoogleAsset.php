@@ -11,7 +11,7 @@ namespace indicalabs\googleplaces;
  * @author Venu Narukulla. Venu <venu.narukulla@gmail.com>
  * @since 2.0
  */
-class GoogleAsset extends yii\web\AssetBundle
+class GoogleAsset extends \yii\web\AssetBundle
 {
 	public $sourcePath = '@indicalabs/googleplaces/assets';
 	public $js = [
