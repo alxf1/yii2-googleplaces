@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace indicalabs\googleplaces;
+namespace indicalabs\google;
 
 /**
  * @author Venu Narukulla. Venu <venu.narukulla@gmail.com>
@@ -13,7 +13,7 @@ namespace indicalabs\googleplaces;
  */
 class GoogleAsset extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@indicalabs/googleplaces/assets';
+	public $sourcePath = '@indicalabs/google/assets';
 	public $js = [
 		'js/jquery.placecomplete.js',
 		//'js/typeahead.js',
@@ -25,6 +25,6 @@ class GoogleAsset extends \yii\web\AssetBundle
 	];
 	public $depends = [
 		'yii\jui\JuiAsset',
-		'indicalabs\select2\Select2Asset',
+		'yii\web\JqueryAsset',
 	];
 }

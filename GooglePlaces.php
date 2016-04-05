@@ -1,11 +1,9 @@
 <?php
-namespace yii\profanity;
+namespace indicalabs\google;
 
 use Yii;
 use yii\helpers\Html;
-use yii\validators\Validator;
-use yii\helpers\Json;
-use yii\validators\ValidationAsset;
+use yii\widgets\InputWidget;
 
 /**
  * @author Bryan Jayson Tan <admin@bryantan.info>
@@ -15,105 +13,66 @@ use yii\validators\ValidationAsset;
  *
  * make sure that you have CURL installed
  */
-class GoogleProfanityValidator extends Validator
+class GooglePlaces extends InputWidget
 {
-    /**
-     * trim left and right
-     * @var bool
-     */
-    public $trim=false;
+	const API_URL = '//maps.googleapis.com/maps/api/js?';
+	public $libraries = 'places';
+	public $sensor = true;
+	
+	public $language = 'en-US';
 
-    /**
-     * trim left character
-     * @var bool
-     */
-    public $trimLeft=false;
+	public $options = [];
+	public $clientOptions = [];
+	
+	public function init()
+	{
+		parent::init();
+	
+		$this->clientOptions = ArrayHelper::merge([
+				'class' => 'form-control',
+		], $this->clientOptions);
+		 
+		$this->options = ArrayHelper::merge($this->options,$this->clientOptions);
+	}
+	
+	/**
+	 * Renders the widget.
+	 */
+	public function run(){
 
-    /**
-     * trim right character
-     * @var bool
-     */
-    public $trimRight=false;
+		$this->registerPlugin('googlePlaces');
+		if ($this->hasModel()) {
+			return Html::activeTextInput($this->model, $this->attribute, $this->options);
+		} else {
+			return Html::textInput($this->name, $this->value, $this->options);
+		}
+	}
 
-    /**
-     * char list for trimming
-     * @var string
-     */
-    public $trimCharList='0123456789';
-
-    /**
-     * replace special characters to letters
-     * e.g. n33d to need
-     * @var bool
-     */
-    public $replaceNumbers=false;
-
-    /**
-     * the url for google profanity
-     * @var string
-     */
-    public $url='http://www.wdyl.com/profanity';
-
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
+	/**
+	 * Registers the needed JavaScript.
+	 */
+	protected function registerPlugin()
     {
-    	parent::init();
-    	if ($this->message === null) {
-    		$this->message = Yii::t('yii', '{attribute} is invalid.');
-    	}
-    }
-    
-    /**
-     * Validates the attribute of the object.
-     * If there is any error, the error message is added to the object.
-     * @param CModel $object the object being validated
-     * @param string $attribute the attribute being validated
-     */
-    public function validateAttribute($object,$attribute)
-    {
-//        $value=$object->$attribute;
-    	$value=urlencode($object->$attribute);
-    		
-        if ($this->trim===true || $this->trimLeft===true){
-            $value=ltrim($value,$this->trimCharList);
-        }
-        if ($this->trim===true || $this->trimRight===true){
-            $value=rtrim($value,$this->trimCharList);
-        }
-        if ($this->replaceNumbers===true){
-            $value=$this->replaceValue($value);
-        }
-
-        $response=$this->curl(sprintf('%s?q=%s',$this->url,$value));
-
-        $response=Json::decode($response);
-
-        if ($response['response']=="true"){
-            $message=$this->message!==null?$this->message:\Yii::t('yii','{attribute} "{value}" has already been taken.');
-            $this->addError($object,$attribute,$message,array('{value}'=>Html::encode($value)));
-        }
-    }
-
-    protected function replaceValue($value){
-        $numbers=array('-','_','1','3','4','5','6','7','8','0','Z');
-        $letters=array('','','i','e','a','s','g','t','b','o','s');
-
-        return str_replace($numbers,$letters,$value);
-    }
-
-    protected function curl($url){
-        $ch = curl_init();
-        $timeout = 5;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-        $data = curl_exec($ch);
-        curl_close($ch);
-        return $data;
-    }
-
-
+    	$view = $this->getView();
+    	GoogleAsset::register($view);
+    	$id = $this->options['id'];
+    	$options = $this->clientOptions !== false && !empty($this->clientOptions)
+    	? Json::encode($this->clientOptions)
+    	: '';
+    	
+    	$view->registerJsFile(self::API_URL . http_build_query([
+    			'libraries' => $this->libraries,
+    			'sensor' => $this->sensor ? 'true' : 'false',
+    			'language' => $this->language
+    	]));
+    	
+    //	jQuery('.placecomplete-{$this->attribute}').placecomplete({
+    	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
+    	$view->registerJs($js, \yii\web\View::POS_READY);
+//(function(){
+//    var input = document.getElementById('{$elementId}');
+//    var options = {$scriptOptions};
+//    new google.maps.places.Autocomplete(input, options);
+//})();
+	}
 }
