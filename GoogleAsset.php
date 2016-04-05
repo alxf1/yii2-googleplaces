@@ -7,13 +7,15 @@
 
 namespace indicalabs\google;
 
+use yii\web\AssetBundle;
+
 /**
  * @author Venu Narukulla. Venu <venu.narukulla@gmail.com>
  * @since 2.0
  */
-class GoogleAsset extends \yii\web\AssetBundle
+class GoogleAsset extends AssetBundle
 {
-	public $sourcePath = '@indicalabs/google/assets';
+	public $sourcePath = __DIR__.'/assets';
 	public $js = [
 		'js/jquery.placecomplete.js',
 		//'js/typeahead.js',
