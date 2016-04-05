@@ -23,6 +23,7 @@ class GoogleAsset extends AssetBundle
 	];
 	public $css = [
 			'css/jquery.placecomplete.css',
+			'css/places.css',
 			//'css/typeahead.js-bootstrap.less',
 	];
 	public $depends = [
