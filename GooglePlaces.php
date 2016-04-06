@@ -67,12 +67,16 @@ class GooglePlaces extends InputWidget
     	]));
     	
     //	jQuery('.placecomplete-{$this->attribute}').placecomplete({
-    	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
-    	$view->registerJs($js, \yii\web\View::POS_READY);
-//(function(){
-//    var input = document.getElementById('{$elementId}');
-//    var options = {$scriptOptions};
-//    new google.maps.places.Autocomplete(input, options);
-//})();
+    //	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
+    //	$view->registerJs($js, \yii\web\View::POS_READY);
+    	$view->registerJs(<<<JS
+(function(){
+    var input = document.getElementById('{$elementId}');
+    var options = {$scriptOptions};
+    new google.maps.places.Autocomplete(input, options);
+})();
+JS
+    	, \yii\web\View::POS_READY);
+    	
 	}
 }
