@@ -1,90 +1,78 @@
 <?php
 namespace indicalabs\google;
 
-use yii\helpers\ArrayHelper;
+use Yii;
 use yii\helpers\Html;
-use yii\helpers\Json;
-use yii\web\JsExpression;
 use yii\widgets\InputWidget;
+
 /**
- * Class PlacesAutocomplete
+ * @author Bryan Jayson Tan <admin@bryantan.info>
+ * @link http://bryantan.info
+ * @date 3/1/13
+ * @time 3:06 PM
  *
- * @author Thiago Oliveira <thiago.oliveira.gt14@gmail.com>
+ * make sure that you have CURL installed
  */
 class GooglePlaces extends InputWidget
 {
-	/**
-	 * @var array Autocomplete plugin options
-	 */
-	public $pluginOptions = [];
-	/**
-	 * @var array TypeAhead options
-	 */
-	public $typeaheadOptions = [];
-	/**
-	 * @var JsExpression|string On select plugin event handler
-	 */
-	public $onSelect;
-	/**
-	 * @var array Default typeahead options
-	 */
-	protected $defaultOptions = ['displayKey' => 'description'];
-	/**
-	 * @var string Adapter variable name
-	 */
-	protected $varName = '';
-	/**
-	 * @var int Widgets counter
-	 */
-	protected static $widgetCounter = 0;
-	/**
-	 * @inheritdoc
-	 */
-	public function run()
+	const API_URL = '//maps.googleapis.com/maps/api/js?';
+	public $libraries = 'places';
+	public $sensor = true;
+	
+	public $language = 'en-US';
+
+	public $options = [];
+	public $clientOptions = [];
+	
+	public function init()
 	{
-		$view = $this->getView();
-		PlacesPluginAsset::register($view);
-		$this->varName = "addressPicker" . static::$widgetCounter++;
-		$script = implode("\n", [$this->buildAdapter(), $this->buildTypeAhead(), $this->buildEvent()]);
-		$view->registerJs($script);
-		return $this->hasModel()
-		? Html::activeTextInput($this->model, $this->attribute, $this->options)
-		: Html::textInput($this->name, $this->value, $this->options);
+		parent::init();
+	
+		$this->clientOptions = ArrayHelper::merge([
+				'class' => 'form-control',
+		], $this->clientOptions);
+		 
+		$this->options = ArrayHelper::merge($this->options,$this->clientOptions);
 	}
+	
 	/**
-	 * Build the required adapter JS
-	 *
-	 * @return string
+	 * Renders the widget.
 	 */
-	protected function buildAdapter()
-	{
-		$options = !empty($this->pluginOptions) ? Json::encode($this->pluginOptions) : '{}';
-		return "var $this->varName = new AddressPicker($options);";
-	}
-	/**
-	 * Build the required plugin event JS
-	 *
-	 * @return string
-	 */
-	protected function buildEvent()
-	{
-		$script = '';
-		if ($this->onSelect) {
-			$event = $this->onSelect instanceof JsExpression ? $this->onSelect : new JsExpression($this->onSelect);
-			$script .= "$this->varName.bindDefaultTypeaheadEvent($('#{$this->options['id']}'));\n";
-			$script .= "$($this->varName).on('addresspicker:selected', $event);";
+	public function run(){
+
+		$this->registerPlugin('googlePlaces');
+		if ($this->hasModel()) {
+			return Html::activeTextInput($this->model, $this->attribute, $this->options);
+		} else {
+			return Html::textInput($this->name, $this->value, $this->options);
 		}
-		return $script;
 	}
+
 	/**
-	 * Build the typeahead initialization JS code
-	 *
-	 * @return string
+	 * Registers the needed JavaScript.
 	 */
-	protected function buildTypeAhead()
-	{
-		$options = ArrayHelper::merge($this->defaultOptions, $this->typeaheadOptions);
-		$options['source'] = new JsExpression("$this->varName.ttAdapter()");
-		return "$('#{$this->options['id']}').typeahead(null, " . Json::encode($options) . ");";
+	protected function registerPlugin()
+    {
+    	$view = $this->getView();
+    	GoogleAsset::register($view);
+    	$id = $this->options['id'];
+    	$options = $this->clientOptions !== false && !empty($this->clientOptions)
+    	? Json::encode($this->clientOptions)
+    	: '';
+    	
+    	$view->registerJsFile(self::API_URL . http_build_query([
+    			'libraries' => $this->libraries,
+    			'sensor' => $this->sensor ? 'true' : 'false',
+    			'language' => $this->language
+    	]));
+    	
+    //	jQuery('.placecomplete-{$this->attribute}').placecomplete({
+    	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
+    	$view->registerJs($js, \yii\web\View::POS_READY);
+//(function(){
+//    var input = document.getElementById('{$elementId}');
+//    var options = {$scriptOptions};
+//    new google.maps.places.Autocomplete(input, options);
+//})();
 	}
 }
