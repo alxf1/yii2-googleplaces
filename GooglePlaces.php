@@ -2,7 +2,9 @@
 namespace indicalabs\google;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\widgets\InputWidget;
 
 /**
@@ -40,7 +42,7 @@ class GooglePlaces extends InputWidget
 	 */
 	public function run(){
 
-		$this->registerPlugin('googlePlaces');
+		$this->registerPlugin('placecomplete');
 		if ($this->hasModel()) {
 			return Html::activeTextInput($this->model, $this->attribute, $this->options);
 		} else {
