@@ -17,7 +17,8 @@ use yii\widgets\InputWidget;
  */
 class GooglePlaces extends InputWidget
 {
-	const API_URL = '//maps.googleapis.com/maps/api/js?';
+ 	const API_URL = 'https://maps.googleapis.com/maps/api/js?';
+	
 	public $libraries = 'places';
 	public $sensor = true;
 	
@@ -62,19 +63,21 @@ class GooglePlaces extends InputWidget
     	? Json::encode($this->clientOptions)
     	: '';
     	
-    	$view->registerJsFile(self::API_URL . http_build_query([
-    			'libraries' => $this->libraries,
-    			'sensor' => $this->sensor ? 'true' : 'false',
-    			'language' => $this->language
-    	]));
+   // 	$view->registerJsFile(self::API_URL . http_build_query([
+    			//'callback' => 'initAutocomplete',
+   // 			'key' => 'AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw',
+   // 			'libraries' => $this->libraries,
+    		//	'sensor' => $this->sensor ? 'true' : 'false',
+    		//	'language' => $this->language
+    //	]));
     	
     //	jQuery('.placecomplete-{$this->attribute}').placecomplete({
     //	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
     //	$view->registerJs($js, \yii\web\View::POS_READY);
     	$view->registerJs(<<<JS
 (function(){
-    var input = document.getElementById('{$elementId}');
-    var options = {$scriptOptions};
+    var input = document.getElementById('{$id}');
+	var options = {$options};
     new google.maps.places.Autocomplete(input, options);
 })();
 JS
