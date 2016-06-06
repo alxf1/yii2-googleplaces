@@ -20,10 +20,11 @@ class GooglePlaces extends InputWidget
  	const API_URL = 'https://maps.googleapis.com/maps/api/js?';
 	
 	public $libraries = 'places';
-	public $sensor = true;
+
 	
 	public $language = 'en-US';
 
+	//'types' => 'establishment', 'componentRestrictions' => ['country' => 'uk']
 	public $options = [];
 	public $clientOptions = [];
 	
@@ -56,6 +57,9 @@ class GooglePlaces extends InputWidget
 	 */
 	protected function registerPlugin()
     {
+    	$className = explode('\\', $this->model->className());
+    	$className = strtolower(end($className));
+    	
     	$view = $this->getView();
     	GoogleAsset::register($view);
     	$id = $this->options['id'];
@@ -63,13 +67,12 @@ class GooglePlaces extends InputWidget
     	? Json::encode($this->clientOptions)
     	: '';
     	
-   // 	$view->registerJsFile(self::API_URL . http_build_query([
-    			//'callback' => 'initAutocomplete',
-   // 			'key' => 'AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw',
-   // 			'libraries' => $this->libraries,
-    		//	'sensor' => $this->sensor ? 'true' : 'false',
-    		//	'language' => $this->language
-    //	]));
+   	$view->registerJsFile(self::API_URL . http_build_query([
+    			'callback' => 'initAutocomplete',
+	   			'key' => 'AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw',
+   				'libraries' => $this->libraries,
+    			'language' => $this->language
+    	]));
     	
     //	jQuery('.placecomplete-{$this->attribute}').placecomplete({
     //	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
@@ -78,10 +81,81 @@ class GooglePlaces extends InputWidget
 (function(){
     var input = document.getElementById('{$id}');
 	var options = {$options};
-    new google.maps.places.Autocomplete(input, options);
+	new google.maps.places.Autocomplete(input, options);
 })();
 JS
-    	, \yii\web\View::POS_READY);
+    	, \yii\web\View::POS_END);
+    	
+$view->registerJs(<<<JS
+		var placeSearch, autocomplete;
+		var componentForm = {
+		  street_number: 'short_name',
+		  route: 'long_name',
+		  locality: 'long_name',
+		  administrative_area_level_1: 'short_name',
+		  administrative_area_level_2: 'long_name',
+		  country: 'long_name',
+		  postal_code: 'short_name'
+		};
+
+		function initAutocomplete() {
+		  // Create the autocomplete object, restricting the search to geographical
+		  // location types.
+		//   autocomplete = new google.maps.places.Autocomplete(
+		//       /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+		//       {types: ['geocode']});
+		
+			var input = document.getElementById('{$id}');
+			var options = {$options};
+		    autocomplete =new google.maps.places.Autocomplete(input, options);
+					
+		  // When the user selects an address from the dropdown, populate the address
+		  // fields in the form.
+		    autocomplete.addListener('place_changed', fillInAddress);
+		}
+		
+		function fillInAddress() {
+		  // Get the place details from the autocomplete object.
+		  var place = autocomplete.getPlace();
+		  for (var component in componentForm) {
+		    document.getElementById("$className-"+component).value = '';
+		    document.getElementById("$className-"+component).disabled = false;
+		  }
+ 		 document.getElementById("$className-location").value = '';
+ 		 document.getElementById("$className-location").disabled = false;
+
+		  // Get each component of the address from the place details
+		  // and fill the corresponding field on the form.
+		  for (var i = 0; i < place.address_components.length; i++) {
+		    var addressType = place.address_components[i].types[0];
+			    if (componentForm[addressType]) {
+			      var val = place.address_components[i][componentForm[addressType]];
+			      document.getElementById("$className-"+addressType).value = val;
+			    }
+		  	}
+		   console.log(JSON.stringify(place['geometry']['location']));
+		   document.getElementById("$className-location").value = JSON.stringify(place['geometry']['location']);
+		}
+		
+		// Bias the autocomplete object to the user's geographical location,
+		// as supplied by the browser's 'navigator.geolocation' object.
+		function geolocate() {
+		  if (navigator.geolocation) {
+		    navigator.geolocation.getCurrentPosition(function(position) {
+		      var geolocation = {
+		        lat: position.coords.latitude,
+		        lng: position.coords.longitude
+		      };
+		      var circle = new google.maps.Circle({
+		        center: geolocation,
+		        radius: position.coords.accuracy
+		      });
+		      autocomplete.setBounds(circle.getBounds());
+		    });
+		  }
+		}	
+JS
+		, \yii\web\View::POS_HEAD);
     	
 	}
 }

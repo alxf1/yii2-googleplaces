@@ -17,8 +17,8 @@ class GoogleAsset extends AssetBundle
 {
 	public $sourcePath = __DIR__.'/assets';
 	public $js = [
-		'js/jquery.placecomplete.js',
-		'https://maps.googleapis.com/maps/api/js?key=AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw&libraries=places&callback=initAutocomplete',
+	//	'js/jquery.placecomplete.js',
+	//	'https://maps.googleapis.com/maps/api/js?key=AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw&libraries=places&callback=initAutocomplete',
 		//'js/typeahead.js',
 	//	'js/typeahead.min.js',
 	];
