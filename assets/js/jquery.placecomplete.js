@@ -24,7 +24,7 @@ function initAutocomplete() {
 
   // When the user selects an address from the dropdown, populate the address
   // fields in the form.
-  autocomplete.addListener('place_changed', fillInAddress);
+ // autocomplete.addListener('place_changed', fillInAddress);
 }
 
 function fillInAddress() {
@@ -45,6 +45,7 @@ function fillInAddress() {
       document.getElementById(addressType).value = val;
     }
   }
+  setupListeners();
 }
 
 // Bias the autocomplete object to the user's geographical location,
@@ -65,3 +66,30 @@ function geolocate() {
   }
 }
 
+function setupListeners() { 
+//  google.maps.event.addDomListener(window, 'load', initialize);
+    // searchbox is the var for the google places object created on the page
+    google.maps.event.addListener(searchbox, 'place_changed', function() {
+      var place = searchbox.getPlace();
+      if (!place.geometry) {
+        // Inform the user that a place was not found and return.
+        return;
+      }  else {      
+        // migrates JSON data from Google to hidden form fields
+        console.log('--------->'.place);
+        populateResult(place);
+      }
+  });
+}
+ 
+function populateResult(place) {
+  // moves JSON data retrieve from Google to hidden form fields
+  // so Yii2 can post the data
+  $('#profile-street_number').val(JSON.stringify(place['geometry']['street_number']));
+  $('#place-route').val(place['route']);
+  $('#place-sublocality').val(place['sublocality']);
+  $('#place-locality').val(place['locality']);
+  $('#place-administrative_area_level_1').val(place['administrative_area_level_1']);
+  $('#place-administrative_area_level_2').val(place['administrative_area_level_2']);
+ // loadMap(place['geometry']['location'],place['name']);
+}
