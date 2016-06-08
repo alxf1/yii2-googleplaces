@@ -23,5 +23,10 @@
         "psr-4": { 
         	"indicalabs\\google\\": "" 
         }
-    }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
 }
