@@ -78,11 +78,11 @@ class GooglePlaces extends InputWidget
     //	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
     //	$view->registerJs($js, \yii\web\View::POS_READY);
     	$view->registerJs(<<<JS
-(function(){
-    var input = document.getElementById('{$id}');
-	var options = {$options};
-	new google.maps.places.Autocomplete(input, options);
-})();
+			(function(){
+			    var input = document.getElementById('{$id}');
+				var options = {$options};
+				new google.maps.places.Autocomplete(input, options);
+			})();
 JS
     	, \yii\web\View::POS_END);
     	
@@ -99,19 +99,24 @@ $view->registerJs(<<<JS
 		};
 
 		function initAutocomplete() {
-		  // Create the autocomplete object, restricting the search to geographical
-		  // location types.
-		//   autocomplete = new google.maps.places.Autocomplete(
-		//       /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-		//       {types: ['geocode']});
-		
 			var input = document.getElementById('{$id}');
 			var options = {$options};
 		    autocomplete =new google.maps.places.Autocomplete(input, options);
-					
+			
+		    var location_being_changed;
+		    onPlaceChange = function () {
+		        location_being_changed = false;
+    	};
+    
 		  // When the user selects an address from the dropdown, populate the address
 		  // fields in the form.
-		    autocomplete.addListener('place_changed', fillInAddress);
+		    google.maps.event.addListener(this.autocomplete,'place_changed', fillInAddress);
+				google.maps.event.addDomListener(input, 'keydown', function (e) {
+				    if (e.keyCode === 13) {
+				            e.preventDefault();
+				            e.stopPropagation();
+ 				    }
+				});
 		}
 		
 		function fillInAddress() {
