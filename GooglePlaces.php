@@ -78,11 +78,11 @@ class GooglePlaces extends InputWidget
     //	$js = "jQuery('#$id').google.maps.places.Autocomplete($options);";
     //	$view->registerJs($js, \yii\web\View::POS_READY);
     	$view->registerJs(<<<JS
-		(function(){
-		    var input = document.getElementById('{$id}');
-			var options = {$options};
-			new google.maps.places.Autocomplete(input, options);
-		})();
+(function(){
+    var input = document.getElementById('{$id}');
+	var options = {$options};
+	new google.maps.places.Autocomplete(input, options);
+})();
 JS
     	, \yii\web\View::POS_END);
     	
