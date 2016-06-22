@@ -69,7 +69,7 @@ class GooglePlaces extends InputWidget
     	
    	$view->registerJsFile(self::API_URL . http_build_query([
     			'callback' => 'initAutocomplete',
-	   			'key' => 'AIzaSyAMt9fik7pVlyxyC7Q12AqPKwaBlqsPmIw',
+	   			'key' => Yii::$app->params['googlePlacesAPIKey'],
    				'libraries' => $this->libraries,
     			'language' => $this->language
     	]));
@@ -92,7 +92,7 @@ $view->registerJs(<<<JS
 		  street_number: 'short_name',
 		  route: 'long_name',
 		  locality: 'long_name',
-		  administrative_area_level_1: 'long_name',
+		  administrative_area_level_1: 'short_name',
 		  administrative_area_level_2: 'long_name',
 		  country: 'long_name',
 		  postal_code: 'short_name'
@@ -123,11 +123,17 @@ $view->registerJs(<<<JS
 		  // Get the place details from the autocomplete object.
 		  var place = autocomplete.getPlace();
 		  for (var component in componentForm) {
-		    document.getElementById("$className-"+component).value = '';
-		    document.getElementById("$className-"+component).disabled = false;
+		  var addrElement = document.getElementById("$className-"+component) ;
+		    if(addrElement != null){
+			    addrElement.value = '';
+			    addrElement.disabled = false;
+		    }
 		  }
- 		 document.getElementById("$className-location").value = '';
- 		 document.getElementById("$className-location").disabled = false;
+		 var addrElement = document.getElementById("$className-location"); 
+		 if(addrElement != null){
+		 		addrElement.value = '';
+		 		addrElement.disabled = false;
+		 	}
 
 		  // Get each component of the address from the place details
 		  // and fill the corresponding field on the form.
@@ -135,11 +141,20 @@ $view->registerJs(<<<JS
 		    var addressType = place.address_components[i].types[0];
 			    if (componentForm[addressType]) {
 			      var val = place.address_components[i][componentForm[addressType]];
-			      document.getElementById("$className-"+addressType).value = val;
+			      
+			      var addrElement = document.getElementById("$className-"+addressType) ;
+				  if(addrElement != null){
+					     addrElement.value = val;
+					     console.log(addrElement.value);
+					    }
 			    }
 		  	}
 		   console.log(JSON.stringify(place['geometry']['location']));
-		   document.getElementById("$className-location").value = JSON.stringify(place['geometry']['location']);
+		   var addrElement = document.getElementById("$className-location") ;
+		   if(addrElement != null){
+		   		addrElement.value = JSON.stringify(place['geometry']['location']);
+		   		console.log(addrElement.value);
+		   		}
 		}
 		
 		// Bias the autocomplete object to the user's geographical location,
