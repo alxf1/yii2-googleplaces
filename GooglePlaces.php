@@ -129,10 +129,10 @@ $view->registerJs(<<<JS
 			    addrElement.disabled = false;
 		    }
 		  }
-		 var addrElement = document.getElementById("$className-location"); 
-		 if(addrElement != null){
-		 		addrElement.value = '';
-		 		addrElement.disabled = false;
+		 var addrLocElement = document.getElementById("$className-location"); 
+		 if(addrLocElement != null){
+		 		addrLocElement.value = '';
+		 		addrLocElement.disabled = false;
 		 	}
 
 		  // Get each component of the address from the place details
@@ -145,15 +145,13 @@ $view->registerJs(<<<JS
 			      var addrElement = document.getElementById("$className-"+addressType) ;
 				  if(addrElement != null){
 					     addrElement.value = val;
-					     console.log(addrElement.value);
+					     console.log(addressType+ "-->" + addrElement.value);
 					    }
 			    }
 		  	}
-		   console.log(JSON.stringify(place['geometry']['location']));
-		   var addrElement = document.getElementById("$className-location") ;
-		   if(addrElement != null){
-		   		addrElement.value = JSON.stringify(place['geometry']['location']);
-		   		console.log(addrElement.value);
+		   if(addrLocElement != null){
+		   		addrLocElement.value = JSON.stringify(place['geometry']['location']);
+				console.log("-->" + addrLocElement.value);
 		   		}
 		}
 		
