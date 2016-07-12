@@ -150,7 +150,8 @@ $view->registerJs(<<<JS
 			    }
 		  	}
 		   if(addrLocElement != null){
-		   		addrLocElement.value = JSON.stringify(place['geometry']['location']);
+		   		//addrLocElement.value = JSON.stringify(place['geometry']['location']);
+				addrLocElement.value = JSON.stringify({"lng": place.geometry.location.lng(), "lat": place.geometry.location.lat()});
 				console.log("-->" + addrLocElement.value);
 		   		}
 		}
